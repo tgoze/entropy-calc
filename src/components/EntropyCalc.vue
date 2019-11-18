@@ -1,26 +1,31 @@
 <template>
     <div>
         <label for="alphabetInput">Input a source alphabet with symbols separated by commas </label>
-        <input id="alphabetInput" type="text" v-on:keyup="getAlphabet($event.target.value)"/>
+        <input id="alphabetInput" type="text"/>
+        <br/>
         <label for="messageInput">Input message using your </label>
-        <input id="messageInput" type="text" v-on:keyup="calculateEntropy($event.target.value)" v-on:keypress="checkInput($event.key)"/>
+        <input id="messageInput" type="text" v-on:keypress="calculateEntropy($event)"/>
+        <br/>
+        <h5>{{entropy}}</h5>
     </div>  
 </template>
 
 <script>
 export default {
   name: 'EntropyCalc',
-  props: {
-    message: Array,
-    entropy: Number
+  props: {    
+    entropy: 0        
   },
-  methods: {
-      getAlphabet: function (input) {
-          var inputArray = input.split(",");
-          var alphabet = Array.from(new Set(inputArray));          
-      },
-      checkInput: function (key) {
-          
+  methods: {      
+      calculateEntropy: function (event) {
+        var alphabetEl = document.getElementById("alphabetInput");
+        var alphabet = Array.from(new Set(alphabetEl.value.split(",")));  
+        var messageEl = document.getElementById("messageInput");
+        var message = messageEl.value;
+        if (alphabet.includes(event.key)) {
+            var probability = ((message.match(new RegExp(event.key, "g")) || []).length + 1) / message.length;
+            this.entropy += -probability * Math.log2(probability);
+        }
       }
   }
 }
